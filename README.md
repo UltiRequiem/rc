@@ -21,26 +21,31 @@ cargo build --release
 ## Usage
 
 ### Process a single file (output to stdout)
+
 ```bash
 rc path/to/file.js
 ```
 
 ### Process a file in-place (modify the original file)
+
 ```bash
 rc --in-place path/to/file.js
 ```
 
 ### Process a directory recursively
+
 ```bash
 rc path/to/directory
 ```
 
 ### Process with verbose output
+
 ```bash
 rc --verbose path/to/directory
 ```
 
 ### Combine options
+
 ```bash
 rc --in-place --verbose path/to/directory
 ```

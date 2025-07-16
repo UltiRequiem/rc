@@ -2,6 +2,13 @@
 name = "rc"
 version = "0.1.0"
 edition = "2021"
+description = "A CLI tool to remove comments from JavaScript and TypeScript files"
+license = "MIT"
+authors = ["Eliaz Bobadilla"]
+repository = "https://github.com/UltiRequiem/rc"
+readme = "README.md"
+keywords = ["cli", "javascript", "typescript", "comments", "remove"]
+categories = ["command-line-utilities", "development-tools"]
 
 [dependencies]
 clap = { version = "4.0", features = ["derive"] }
