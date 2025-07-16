@@ -1,5 +1,5 @@
 [package]
-name = "rc"
+name = "rcy"
 version = "0.1.0"
 edition = "2021"
 description = "A CLI tool to remove comments from JavaScript and TypeScript files"
@@ -9,6 +9,10 @@ repository = "https://github.com/UltiRequiem/rc"
 readme = "README.md"
 keywords = ["cli", "javascript", "typescript", "comments", "remove"]
 categories = ["command-line-utilities", "development-tools"]
+
+[[bin]]
+name = "rcy"
+path = "src/main.rs"
 
 [dependencies]
 clap = { version = "4.0", features = ["derive"] }

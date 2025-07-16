@@ -135,7 +135,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "rc"
+name = "rcy"
 version = "0.1.0"
 dependencies = [
  "clap",
