@@ -9,11 +9,11 @@ use walkdir::WalkDir;
 struct Cli {
     /// Path to file or directory to process
     path: String,
-    
+
     /// Process files in-place (modify original files)
     #[arg(short, long)]
     in_place: bool,
-    
+
     /// Verbose output
     #[arg(short, long)]
     verbose: bool,
@@ -21,9 +21,9 @@ struct Cli {
 
 fn main() {
     let cli = Cli::parse();
-    
+
     let path = Path::new(&cli.path);
-    
+
     if path.is_file() {
         if is_js_or_ts_file(path) {
             process_file(path, cli.in_place, cli.verbose);
@@ -50,7 +50,7 @@ fn is_js_or_ts_file(path: &Path) -> bool {
 
 fn process_directory(dir: &Path, in_place: bool, verbose: bool) {
     let mut processed_count = 0;
-    
+
     for entry in WalkDir::new(dir) {
         match entry {
             Ok(entry) => {
@@ -65,7 +65,7 @@ fn process_directory(dir: &Path, in_place: bool, verbose: bool) {
             }
         }
     }
-    
+
     if verbose {
         println!("Processed {} files", processed_count);
     }
@@ -75,7 +75,7 @@ fn process_file(path: &Path, in_place: bool, verbose: bool) {
     if verbose {
         println!("Processing: {}", path.display());
     }
-    
+
     let content = match fs::read_to_string(path) {
         Ok(content) => content,
         Err(e) => {
@@ -83,9 +83,9 @@ fn process_file(path: &Path, in_place: bool, verbose: bool) {
             return;
         }
     };
-    
+
     let cleaned_content = remove_comments(&content);
-    
+
     if in_place {
         match fs::write(path, cleaned_content) {
             Ok(_) => {
@@ -109,20 +109,20 @@ fn remove_comments(content: &str) -> String {
     let mut string_char = '\0';
     let mut escape_next = false;
     let mut chars = content.chars().peekable();
-    
+
     while let Some(ch) = chars.next() {
         if escape_next {
             result.push(ch);
             escape_next = false;
             continue;
         }
-        
+
         if ch == '\\' && (in_string || in_template_literal) {
             result.push(ch);
             escape_next = true;
             continue;
         }
-        
+
         if !in_string && !in_template_literal {
             // Check for template literal start
             if ch == '`' {
@@ -130,7 +130,7 @@ fn remove_comments(content: &str) -> String {
                 result.push(ch);
                 continue;
             }
-            
+
             // Check for string start
             if ch == '"' || ch == '\'' {
                 in_string = true;
@@ -138,11 +138,11 @@ fn remove_comments(content: &str) -> String {
                 result.push(ch);
                 continue;
             }
-            
+
             // Check for single-line comment
             if ch == '/' && chars.peek() == Some(&'/') {
                 // Skip until end of line
-                while let Some(next_ch) = chars.next() {
+                for next_ch in chars.by_ref() {
                     if next_ch == '\n' {
                         result.push(next_ch);
                         break;
@@ -150,12 +150,12 @@ fn remove_comments(content: &str) -> String {
                 }
                 continue;
             }
-            
+
             // Check for multi-line comment
             if ch == '/' && chars.peek() == Some(&'*') {
                 chars.next(); // consume the '*'
                 let mut found_end = false;
-                
+
                 while let Some(next_ch) = chars.next() {
                     if next_ch == '*' && chars.peek() == Some(&'/') {
                         chars.next(); // consume the '/'
@@ -163,7 +163,7 @@ fn remove_comments(content: &str) -> String {
                         break;
                     }
                 }
-                
+
                 if !found_end {
                     // Unclosed comment, this shouldn't happen in valid JS/TS
                     eprintln!("Warning: Unclosed multi-line comment found");
@@ -171,7 +171,7 @@ fn remove_comments(content: &str) -> String {
                 continue;
             }
         }
-        
+
         // Handle string/template literal endings
         if in_string && ch == string_char {
             in_string = false;
@@ -179,15 +179,15 @@ fn remove_comments(content: &str) -> String {
         } else if in_template_literal && ch == '`' {
             in_template_literal = false;
         }
-        
+
         result.push(ch);
     }
-    
+
     // Clean up multiple consecutive empty lines
     let lines: Vec<&str> = result.lines().collect();
     let mut cleaned_lines = Vec::new();
     let mut empty_line_count = 0;
-    
+
     for line in lines {
         if line.trim().is_empty() {
             empty_line_count += 1;
@@ -199,6 +199,6 @@ fn remove_comments(content: &str) -> String {
             cleaned_lines.push(line);
         }
     }
-    
+
     cleaned_lines.join("\n")
 }
